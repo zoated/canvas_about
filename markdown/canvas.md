@@ -2,8 +2,8 @@
 
 ## 前言
 
->
- canvas元素在前端日常开发中有着百宝箱般多样的用法，今天这篇文章主要讲解canvas标签的基本使用和如何实现日常开发中常见的canvas签名板，以及进阶轨迹签名轨迹播放的思路，在了解canvas基本用法之余，通过实践有更深的canvas使用了解。
+> canvas元素在前端日常开发中有着百宝箱般多样的用法，今天这篇文章主要讲解canvas标签的基本使用和如何实现日常开发中常见的canvas签名板，以及进阶
+> 轨迹签名轨迹播放的思路，在了解canvas基本用法之余，通过实践有更深的canvas使用了解。
 
 ## canvas基本用法
 
@@ -50,9 +50,8 @@ canvasBox.fill()
 
 ### canvas签名实现
 
->
-canvas签名的实现思路是监听鼠标事件 - onMouseDown，onMouseMove，onMouseUp，通过onMouseDown事件标识绘画开始，onMouseMove事件计算鼠标移动路径，绘制路径。onMouseDown事件标识绘画结束。
->
+> canvas签名的实现思路是监听鼠标事件 - onMouseDown，onMouseMove，onMouseUp，通过onMouseDown事件标识绘画开始，onMouseMove事件计算鼠
+> 标移动路径，绘制路径。onMouseDown事件标识绘画结束。
 
 ```javascript
     // 绘画开始
@@ -96,9 +95,9 @@ canvas签名的实现思路是监听鼠标事件 - onMouseDown，onMouseMove，o
 
 ### 笔画轨迹播放
 
->
-笔画轨迹播放的实现思路大概就是保存所有x轴和y轴的路径数组，再通过setInterval累加索引不断绘制连接x轴和y轴的点。第一次实现的方式通过forEach遍历绘制，结果发现瞬间结果就出来列。
->
+> 笔画轨迹播放的实现思路大概就是保存所有x轴和y轴的路径数组，再通过setInterval累加索引不断绘制连接x轴和y轴的点。第一次实现的方式通过forEach遍
+> 历绘制，结果发现瞬间结果就出来列。
+
 ```javascript
 allCoordinate.forEach(item => {
     canvas2.canvasBox.save()
@@ -108,9 +107,9 @@ allCoordinate.forEach(item => {
     canvas2.canvasBox.stroke()
 })
 ```
->
-然后改成setInterval方式伪递归实现，不过这种方式存在断点的问题。
->
+
+> 然后改成setInterval方式伪递归实现，不过这种方式存在断点的问题。
+
 ```javascript
 let index = 0
 const intervalHandle = window.setInterval(() => {
@@ -124,7 +123,8 @@ const intervalHandle = window.setInterval(() => {
 },0)
 ```
 
-思考会不会是点和点之间相差时间的时间导致的，想要还原原来的笔画速度和轨迹，还需要保存路径点与开始路径点的相差时间,设置setInterval入参时间为路径点与路径点的相差时间能解决这个问题。按照这个思路实现，发现断点的减少了，但是还是存在少量断点。
+> 思考会不会是点和点之间相差时间的时间导致的，想要还原原来的笔画速度和轨迹，还需要保存路径点与开始路径点的相差时间,设置setInterval入参时间为路
+> 径点与路径点的相差时间能解决这个问题。按照这个思路实现，发现断点的减少了，但是还是存在少量断点。
 
 ```javascript
 allCoordinate.forEach((item,index) => {
@@ -139,9 +139,8 @@ allCoordinate.forEach((item,index) => {
 })
 ```
 
->
-既然问题不是在时间上，那问题应该还是在点数组上，笔画是通过多段路径绘制形成的，保存多段这样的路径数组是不是能解决问题。果然最终通过保存每次onMouseDown鼠标事件开始和onMouseUp鼠标事件结束为一段路径的路径点数组组成的对象，通过每个起点和终点的连续路径绘制不会有断点了。
->
+> 既然问题不是在时间上，那问题应该还是在点数组上，笔画是通过多段路径绘制形成的，保存多段这样的路径数组是不是能解决问题。果然最终通过保存每次
+> onMouseDown鼠标事件开始和onMouseUp鼠标事件结束为一段路径的路径点数组组成的对象，通过每个起点和终点的连续路径绘制不会有断点了。
 
 ```javascript
 let textIndex = 0
