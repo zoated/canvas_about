@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <div>canvas 画板</div>
+    <canvas id="canvas-1" width="1000" height="300" style="border: 1px solid;"></canvas>
+    <button onClick="playHistoryStroke()" >轨迹播放</button>
+    <canvas id="canvas-2" width="1000" height="300" style="border: 1px solid;"></canvas>
+</body>
+<script>
+
+    let coordinate = null
+    let allCoordinate = {}
+    let startTime = new Date().getTime()
+    let isMove = false
+    let textIndex = 0
+
+    function getCanvas(canvasName){
+        const canvasDoc = document.getElementById(canvasName)
+        const canvasBox = canvasDoc.getContext('2d')
+        canvasBox.lineWidth = 10         // 直线宽度
+        canvasBox.strokeStyle = 'black'     // 路径的颜色
+        canvasBox.lineCap = 'round'         // 直线首尾端圆滑
+        canvasBox.lineJoin = 'round'     // 当两条线条交汇时，创建圆形边角
+        canvasBox.shadowBlur = 1         // 边缘模糊，防止直线边缘出现锯齿
+        canvasBox.shadowColor = 'black'  // 边缘颜色
+        return {canvasDoc,canvasBox}
+    }
+
+    const canvas1 = getCanvas('canvas-1')
+    const canvas2 = getCanvas('canvas-2')
+
+    function beginPath(e, canvasBox) {
+        isMove = true
+        canvasBox.beginPath()
+        canvasBox.save()
+        allCoordinate[textIndex] = []
+    }
+
+    function draw(e, canvasObj) {
+        const {canvasBox, canvasDoc} = canvasObj
+        if(coordinate && isMove){
+            const xy = this.getCoordinate(e, canvasDoc)
+            allCoordinate[textIndex].push(xy)
+            canvasBox.save()
+            canvasBox.moveTo(xy?.x,xy?.y)
+            canvasBox.lineTo(coordinate.x,coordinate.y)
+            canvasBox.stroke()
+        }
+        coordinate = this.getCoordinate(e, canvasDoc)
+
+    }
+
+    function endDraw(canvasBox) {
+        coordinate = null
+        textIndex++
+        isMove = false
+    }
+
+    function getCoordinate(e, canvasDoc) {
+        var x, y
+        x = e.clientX - canvasDoc.offsetLeft
+        y = e.clientY - canvasDoc.offsetTop // 获取当前x,y坐标
+        timer = new Date().getTime() - startTime
+        return {
+           x,y,timer
+        }
+    }
+
+    function playHistoryStroke() {
+        console.log(allCoordinate)
+        let textIndex = 0
+        let index = 0
+        // allCoordinate.forEach(item => {
+        //     canvas2.canvasBox.save()
+        //     canvas2.canvasBox.moveTo(item?.x,item?.y)
+        //     canvas2.canvasBox.lineTo(item?.x,item?.y)
+        //     canvas2.canvasBox.restore()
+        //     canvas2.canvasBox.stroke()
+        // })
+        const intervalHandle = window.setInterval(() => {
+            line = allCoordinate?.[textIndex]?.[index];
+            if(line){
+                if (index == 0) {
+                    canvas2.canvasBox.moveTo(line?.x, line?.y)
+                }
+                canvas2.canvasBox.save()
+                canvas2.canvasBox.lineTo(line?.x,line?.y)
+                canvas2.canvasBox.restore()
+                canvas2.canvasBox.stroke()
+                index++
+            }else{
+                index = 0
+                textIndex++
+            }
+        },0)
+        
+    }
+
+    // 监听事件
+    canvas1.canvasDoc.onmousedown = function(ev){
+        var ev = ev || event
+        beginPath(ev, canvas1.canvasBox)
+    }
+    canvas1.canvasDoc.onmousemove = function(ev){
+        var ev = ev || event
+        draw(ev, canvas1)
+    }
+    canvas1.canvasDoc.onmouseup = function(){
+        endDraw(canvas1.canvasBox)
+    }
+</script>
+</html>
